@@ -43,6 +43,7 @@ public class OverlayHandler {
 
             if (!stack.isEmpty()) {
                 guiGraphics.renderItem(stack, xPos, yPos);
+                guiGraphics.renderItemDecorations(font, stack, xPos, yPos);
 
                 if (stack.isDamageableItem()) {
                     int maxDamage = stack.getMaxDamage();
