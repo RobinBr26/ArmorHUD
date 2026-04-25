@@ -1,0 +1,62 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.fabricmc.fabric-loom-remap'
+}
+
+version = rootProject.mod_version
+group = rootProject.mod_group_id
+
+base {
+    archivesName = "${rootProject.mod_id}-fabric-${rootProject.minecraft_version}"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+sourceSets.main {
+    java {
+        srcDirs = ['src/main/java', '../common/src/main/java']
+    }
+    resources {
+        srcDirs = ['src/main/resources', '../common/src/main/resources']
+    }
+}
+
+repositories {
+    maven { url = 'https://maven.terraformersmc.com/releases/' }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    mappings loom.officialMojangMappings()
+
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+
+    modCompileOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
+    modRuntimeOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
+}
+
+tasks.withType(ProcessResources).configureEach {
+    def replaceProperties = [
+            minecraft_version  : rootProject.minecraft_version,
+            fabric_loader_version: rootProject.fabric_loader_version,
+            fabric_api_version : rootProject.fabric_api_version,
+            modmenu_version    : rootProject.modmenu_version,
+            mod_id             : rootProject.mod_id,
+            mod_name           : rootProject.mod_name,
+            mod_license        : rootProject.mod_license,
+            mod_version        : rootProject.mod_version,
+            mod_authors        : rootProject.mod_authors,
+            mod_description    : rootProject.mod_description
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['fabric.mod.json']) {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
